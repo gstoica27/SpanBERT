@@ -1,5 +1,5 @@
 model: spanbert-large-cased
-data_dir: /usr0/home/gis/data/tacred/data/json
+data_dir: /usr0/home/gis/data/tacred/data/json/relabeled
 output_dir:
 eval_per_epoch: 10
 max_seq_length: 128
@@ -28,4 +28,4 @@ with_jrrelp: False
 jrrelp_lambda: .1
 without_observed: False
 without_verification: False
-exclude_no_relation: True
+exclude_no_relation: False
