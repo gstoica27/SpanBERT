@@ -121,7 +121,10 @@ class DataProcessor(object):
 
     def get_labels(self, data_dir, negative_label="no_relation"):
         """See base class."""
-        dataset = self._read_json(os.path.join(data_dir, "train.json"))
+        train_dataset = self._read_json(os.path.join(data_dir, "train.json"))
+        dev_dataset = self._read_json(os.path.join(data_dir, "dev.json"))
+        test_dataset = self._read_json(os.path.join(data_dir, "test.json"))
+        dataset = train_dataset + dev_dataset + test_dataset
         count = Counter()
         for example in dataset:
             count[example['relation']] += 1
