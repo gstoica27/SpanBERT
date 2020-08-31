@@ -24,7 +24,7 @@ gradient_accumulation_steps: 2
 fp16: True
 loss_scale: 0
 
-with_jrrelp: True
+with_jrrelp: False
 jrrelp_lambda: .1
 without_observed: False
 without_verification: False
