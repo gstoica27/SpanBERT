@@ -39,7 +39,7 @@ class AttrDict(dict):
         self.__dict__ = self
 
 def create_model_name(cfg_dict):
-    top_level_name = 'TACRED'
+    top_level_name = 'TACRED-{}'.format(cfg_dict['data_type'])
     approach_type = 'SpanBERT-JRRELP' if cfg_dict['with_jrrelp'] is not None else 'SpanBERT'
     main_name = '{}-{}-{}-{}-{}-{}'.format(
         cfg_dict['feature_mode'], cfg_dict['learning_rate'], cfg_dict['warmup_proportion'],
