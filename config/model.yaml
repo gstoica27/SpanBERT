@@ -26,7 +26,7 @@ loss_scale: 0
 data_type: patched
 version: full
 with_jrrelp: False
-jrrelp_lambda: .1
-without_observed: False
-without_verification: False
-exclude_no_relation: False
+#jrrelp_lambda: .1
+#without_observed: False
+#without_verification: False
+#exclude_no_relation: False
