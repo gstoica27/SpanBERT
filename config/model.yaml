@@ -15,7 +15,7 @@ feature_mode: ner
 train_batch_size: 16
 eval_batch_size: 32
 eval_metric: f1
-learning_rate: 0.00002
+learning_rate: 0.00002 # Play with the LR. Reduce the LR
 num_train_epochs: 10
 warmup_proportion: .1
 no_cuda: False
@@ -24,6 +24,7 @@ gradient_accumulation_steps: 2
 fp16: True
 loss_scale: 0
 data_type: patched
+version: full
 with_jrrelp: False
 jrrelp_lambda: .1
 without_observed: False

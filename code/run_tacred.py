@@ -40,7 +40,7 @@ class AttrDict(dict):
 
 def create_model_name(cfg_dict):
     top_level_name = 'TACRED-{}'.format(cfg_dict['data_type'])
-    approach_type = 'SpanBERT-JRRELP' if cfg_dict['with_jrrelp'] is not None else 'SpanBERT'
+    approach_type = 'SpanBERT-JRRELP' if cfg_dict['with_jrrelp'] else 'SpanBERT'
     main_name = '{}-{}-{}-{}-{}-{}'.format(
         cfg_dict['feature_mode'], cfg_dict['learning_rate'], cfg_dict['warmup_proportion'],
         cfg_dict['seed'], cfg_dict['eval_metric'], cfg_dict['max_seq_length']
@@ -97,6 +97,8 @@ class InputFeatures(object):
 
 class DataProcessor(object):
     """Processor for the TACRED data set."""
+    def __init__(self, version='clean'):
+        self.version = version
 
     @classmethod
     def _read_json(cls, input_file):
@@ -107,23 +109,23 @@ class DataProcessor(object):
     def get_train_examples(self, data_dir):
         """See base class."""
         return self._create_examples(
-            self._read_json(os.path.join(data_dir, "train.json")), "train")
+            self._read_json(os.path.join(data_dir, f"train_{self.version}.json")), "train")
 
     def get_dev_examples(self, data_dir):
         """See base class."""
         return self._create_examples(
-            self._read_json(os.path.join(data_dir, "dev.json")), "dev")
+            self._read_json(os.path.join(data_dir, f"dev_{self.version}.json")), "dev")
 
     def get_test_examples(self, data_dir):
         """See base class."""
         return self._create_examples(
-            self._read_json(os.path.join(data_dir, "test.json")), "test")
+            self._read_json(os.path.join(data_dir, f"test_{self.version}.json")), "test")
 
     def get_labels(self, data_dir, negative_label="no_relation"):
         """See base class."""
-        train_dataset = self._read_json(os.path.join(data_dir, "train.json"))
-        dev_dataset = self._read_json(os.path.join(data_dir, "dev.json"))
-        test_dataset = self._read_json(os.path.join(data_dir, "test.json"))
+        train_dataset = self._read_json(os.path.join(data_dir, f"train_{self.version}.json"))
+        dev_dataset = self._read_json(os.path.join(data_dir, f"dev_{self.version}.json"))
+        test_dataset = self._read_json(os.path.join(data_dir, f"test_{self.version}.json"))
         dataset = train_dataset + dev_dataset + test_dataset
         count = Counter()
         for example in dataset:
@@ -414,7 +416,7 @@ def main(args):
         device, n_gpu, args.fp16))
     object_indices = torch.tensor([3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], dtype=torch.long).to(
         device)
-    processor = DataProcessor()
+    processor = DataProcessor(version=args.version)
     label_list = processor.get_labels(args.data_dir, args.negative_label)
     label2id = {label: i for i, label in enumerate(label_list)}
     id2label = {i: label for i, label in enumerate(label_list)}
