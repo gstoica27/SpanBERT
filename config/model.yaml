@@ -19,10 +19,10 @@ learning_rate: 0.00002 # Play with the LR. Reduce the LR
 num_train_epochs: 10
 warmup_proportion: .1
 no_cuda: False
-seed: 42
+seed: 0
 gradient_accumulation_steps: 2
 fp16: True
-loss_scale: 0
+loss_scale: 2
 data_type: patched
 version: full
 with_jrrelp: False
