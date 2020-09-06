@@ -22,6 +22,7 @@ from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE, WE
 from pytorch_pretrained_bert.modeling import BertForSequenceClassification
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.optimization import BertAdam, warmup_linear
+from utils.scorer import score
 
 CLS = "[CLS]"
 SEP = "[SEP]"
@@ -308,7 +309,7 @@ def compute_f1(preds, labels):
         return {'precision': prec, 'recall': recall, 'f1': f1}
 
 
-def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, verbose=True):
+def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2label, verbose=True):
     model.eval()
     eval_loss = 0
     nb_eval_steps = 0
@@ -331,7 +332,10 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, verbose
                 preds[0], logits.detach().cpu().numpy(), axis=0)
 
     eval_loss = eval_loss / nb_eval_steps
-    preds = np.argmax(preds[0], axis=1)
+    preds = np.argmax(preds[0], axis=1).reshape(-1)
+    pred_labels = [id2label[pred_id] for pred_id in preds]
+    eval_labels = [id2label[label_id] for label_id in eval_label_ids.numpy().reshape(-1)]
+    score(eval_labels, pred_labels, verbose=verbose)
     result = compute_f1(preds, eval_label_ids.numpy())
     result['accuracy'] = simple_accuracy(preds, eval_label_ids.numpy())
     result['eval_loss'] = eval_loss
@@ -340,6 +344,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, verbose
         for key in sorted(result.keys()):
             logger.info("  %s = %s", key, str(result[key]))
     return preds, result
+
 
 
 def main(args):
@@ -511,7 +516,7 @@ def main(args):
                                      time.time() - start_time, tr_loss / nb_tr_steps))
                         save_model = False
                         if args.do_eval:
-                            preds, result = evaluate(model, device, eval_dataloader, eval_label_ids, num_labels)
+                            preds, result = evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2label)
                             model.train()
                             result['global_step'] = global_step
                             result['epoch'] = epoch
@@ -561,7 +566,7 @@ def main(args):
         if args.fp16:
             model.half()
         model.to(device)
-        preds, result = evaluate(model, device, eval_dataloader, eval_label_ids, num_labels)
+        preds, result = evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2label)
         with open(os.path.join(args.output_dir, "predictions.txt"), "w") as f:
             for ex, pred in zip(eval_examples, preds):
                 f.write("%s\t%s\n" % (ex.guid, id2label[pred]))
