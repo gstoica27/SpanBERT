@@ -380,7 +380,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     preds = np.argmax(preds[0], axis=1).reshape(-1)
     pred_labels = [id2label[pred_id] for pred_id in preds]
     eval_labels = [id2label[label_id] for label_id in eval_label_ids.numpy().reshape(-1)]
-    score(eval_labels, pred_labels, verbos=verbose)
+    score(eval_labels, pred_labels, verbose=verbose)
     result = compute_f1(preds, eval_label_ids.numpy())
     result['accuracy'] = simple_accuracy(preds, eval_label_ids.numpy())
     result['eval_loss'] = eval_loss
