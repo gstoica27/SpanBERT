@@ -225,7 +225,13 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
         if e1rel not in kg:
             kg[e1rel] = set()
         # Subtract offset so that the JRRELP loss labels are indexed correctly
-        kg[e1rel].add(object_id - object_offset)
+        zero_indexed_object_id = object_id - object_offset
+        if zero_indexed_object_id > 16:
+            print('Object Id: {} | Offset: {} | Zero Index: {}'.format(object_id, object_offset, zero_indexed_object_id))
+            print('Object NER: {}'.format(OBJECT_NER))
+            print(special_tokens)
+            exit()
+        kg[e1rel].add(zero_indexed_object_id)
 
         if mode.startswith("text"):
             for i, token in enumerate(example.sentence):
