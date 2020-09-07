@@ -198,7 +198,7 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
 
     object_indices = np.arange(19, 35).tolist()
     kg = {}
-    object_offset = 3
+    object_offset = 19
     def get_special_token(w):
         if w not in special_tokens:
             special_tokens[w] = "[unused%d]" % (len(special_tokens) + 1)
