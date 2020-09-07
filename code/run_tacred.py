@@ -319,8 +319,9 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
                               label_id=label_id,
                               subject_id=subject_id
                               ))
-    print('Skip Number: {}'.format(skip_count))
-    exit()
+    if skip_count > 0
+        print('Skip Number: {}'.format(skip_count))
+        exit()
     # Add KG outputs to features
     for feature in tqdm(features):
         feature_subject = feature.subject_id
