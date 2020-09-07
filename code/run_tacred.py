@@ -24,7 +24,7 @@ from pytorch_pretrained_bert.modeling import BertForSequenceClassification
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 from pytorch_pretrained_bert.optimization import BertAdam, warmup_linear
 from link_prediction_models import ConvE
-from scorer import score
+from utils.scorer import score
 
 CLS = "[CLS]"
 SEP = "[SEP]"
