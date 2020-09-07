@@ -1,9 +1,9 @@
 model: spanbert-large-cased
-data_dir: /home/ec2-user/apex/main_dataset
+data_dir: /home/ec2-user/apex/semeval
 output_dir:
 eval_per_epoch: 10
 max_seq_length: 128
-negative_label: "no_relation"
+negative_label: "Other"
 # What to run
 do_train: True
 train_mode: random_sorted # choices: ['random', 'sorted', 'random_sorted']
@@ -24,7 +24,7 @@ gradient_accumulation_steps: 2
 fp16: True
 loss_scale: 0
 
-with_jrrelp: True
+with_jrrelp: False
 jrrelp_lambda: .01
 without_observed: False
 without_verification: False
