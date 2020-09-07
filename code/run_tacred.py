@@ -302,7 +302,10 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
         input_ids += padding
         input_mask += padding
         segment_ids += padding
-        label_id = label2id[example.label]
+        relation = example.label
+        if '(e2,e1)' in relation or '(e1,e2)' in relation:
+            relation = relation[:-7]
+        label_id = label2id[relation]
         assert len(input_ids) == max_seq_length
         assert len(input_mask) == max_seq_length
         assert len(segment_ids) == max_seq_length
