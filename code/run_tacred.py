@@ -108,7 +108,7 @@ class DataProcessor(object):
     def get_train_examples(self, data_dir):
         """See base class."""
         return self._create_examples(
-            self._read_json(os.path.join(data_dir, "train.json")), "train")
+            self._read_json(os.path.join(data_dir, "train_sampled.json")), "train")
 
     def get_dev_examples(self, data_dir):
         """See base class."""
@@ -122,7 +122,7 @@ class DataProcessor(object):
 
     def get_labels(self, data_dir, negative_label="no_relation"):
         """See base class."""
-        dataset = self._read_json(os.path.join(data_dir, "train.json"))
+        dataset = self._read_json(os.path.join(data_dir, "train_sampled.json"))
         count = Counter()
         for example in dataset:
             count[example['relation']] += 1
