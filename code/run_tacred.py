@@ -157,7 +157,7 @@ class DataProcessor(object):
 
 def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, special_tokens, mode='text'):
     special_tokens = {
-        'SUBJ=0': '[unused1]',
+        'SUBJ=O': '[unused1]',
         'SUBJ=TITLE': '[unused2]',
         'SUBJ=CAUSE_OF_DEATH': '[unused3]',
         'SUBJ=CRIMINAL_CHARGE': '[unused4]',
@@ -175,30 +175,32 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
         'SUBJ=LOCATION': '[unused16]',
         'SUBJ=ORDINAL': '[unused17]',
         'SUBJ=NATIONALITY': '[unused18]',
+        'SUBJ=MISC': '[unused19]',
 
-        'OBJ=O': '[unused19]',
-        'OBJ=TITLE': '[unused20]',
-        'OBJ=CAUSE_OF_DEATH': '[unused21]',
-        'OBJ=CRIMINAL_CHARGE': '[unused22]',
-        'OBJ=DATE': '[unused23]',
-        'OBJ=SET': '[unused24]',
-        'OBJ=DURATION': '[unused25]',
-        'OBJ=MONEY': '[unused26]',
-        'OBJ=RELIGION': '[unused27]',
-        'OBJ=COUNTRY': '[unused28]',
-        'OBJ=IDEOLOGY': '[unused29]',
-        'OBJ=NATIONALITY': '[unused30]',
-        'OBJ=LOCATION': '[unused31]',
-        'OBJ=MISC': '[unused32]',
-        'OBJ=TIME': '[unused33]',
-        'ORG=ORDINAL': '[unused34]',
+        'OBJ=O': '[unused20]',
+        'OBJ=TITLE': '[unused21]',
+        'OBJ=CAUSE_OF_DEATH': '[unused22]',
+        'OBJ=CRIMINAL_CHARGE': '[unused23]',
+        'OBJ=DATE': '[unused24]',
+        'OBJ=SET': '[unused25]',
+        'OBJ=DURATION': '[unused26]',
+        'OBJ=MONEY': '[unused27]',
+        'OBJ=RELIGION': '[unused28]',
+        'OBJ=COUNTRY': '[unused29]',
+        'OBJ=IDEOLOGY': '[unused30]',
+        'OBJ=NATIONALITY': '[unused31]',
+        'OBJ=LOCATION': '[unused32]',
+        'OBJ=MISC': '[unused33]',
+        'OBJ=TIME': '[unused34]',
+        'OBJ=ORDINAL': '[unused35]',
 
+        'ORG=ORDINAL': '[unused36]',
     }
     """Loads a data file into a list of `InputBatch`s."""
 
-    object_indices = np.arange(19, 35).tolist()
+    object_indices = np.arange(20, 37).tolist()
     kg = {}
-    object_offset = 19
+    object_offset = 20
     def get_special_token(w):
         if w not in special_tokens:
             special_tokens[w] = "[unused%d]" % (len(special_tokens) + 1)
@@ -208,9 +210,14 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
     num_fit_examples = 0
     num_shown_examples = 0
     features = []
+    skip_count = 0
     for (ex_index, example) in enumerate(examples):
         if ex_index % 10000 == 0:
             logger.info("Writing example %d of %d" % (ex_index, len(examples)))
+
+        if example.ner2 in {'SUBJ_START', 'SUBJ_END', 'OBJ_START', 'OBJ_END'}:
+            skip_count += 1
+            continue
 
         tokens = [CLS]
         SUBJECT_START = get_special_token("SUBJ_START")
@@ -312,6 +319,8 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
                               label_id=label_id,
                               subject_id=subject_id
                               ))
+    print('Skip Number: {}'.format(skip_count))
+    exit()
     # Add KG outputs to features
     for feature in tqdm(features):
         feature_subject = feature.subject_id
