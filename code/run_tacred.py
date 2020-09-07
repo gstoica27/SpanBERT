@@ -311,7 +311,7 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
         feature_subject = feature.subject_id
         feature_label = feature.label_id
         known_object_ids = list(kg[(feature_subject, feature_label)])
-        if feature_label == label2id['no_relation']:
+        if feature_label == label2id['Other']:
             known_objects = np.ones(len(object_indices), dtype=np.float32)
         else:
             known_objects = np.zeros(len(object_indices), dtype=np.float32)
@@ -591,7 +591,7 @@ def main(args):
                         cyclic_loss = kglp_model.loss(cyclic_logits, known_objects)
                         cyclic_loss *= (1 - args['without_verification'])
                         if args.exclude_no_relation:
-                            no_relation_blacklist = torch.eq(label_ids, label2id['no_relation']).eq(0).type(torch.half).unsqueeze(-1)
+                            no_relation_blacklist = torch.eq(label_ids, label2id['Other']).eq(0).type(torch.half).unsqueeze(-1)
                             standard_loss *= no_relation_blacklist
                             cyclic_loss *= no_relation_blacklist
                         standard_loss = standard_loss.mean()
