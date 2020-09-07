@@ -380,7 +380,7 @@ def main(args):
     label_list = processor.get_labels(args.data_dir, args.negative_label)
     label2id = {label: i for i, label in enumerate(label_list)}
     print(label2id)
-    exit()
+    # exit()
     id2label = {i: label for i, label in enumerate(label_list)}
     num_labels = len(label_list)
     tokenizer = BertTokenizer.from_pretrained(args.model, do_lower_case=args.do_lower_case)
