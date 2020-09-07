@@ -39,7 +39,7 @@ class AttrDict(dict):
         self.__dict__ = self
 
 def create_model_name(cfg_dict):
-    top_level_name = 'TACRED'
+    top_level_name = 'SemEval'
     approach_type = 'SpanBERT-JRRELP' if cfg_dict['with_jrrelp'] is not None else 'SpanBERT'
     main_name = '{}-{}-{}-{}-{}-{}'.format(
         cfg_dict['feature_mode'], cfg_dict['learning_rate'], cfg_dict['warmup_proportion'],
@@ -155,30 +155,47 @@ class DataProcessor(object):
 
 
 def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, special_tokens, mode='text'):
-    """Loads a data file into a list of `InputBatch`s."""
     special_tokens = {
-        'SUBJ=ORGANIZATION': '[unused1]',
-        'SUBJ=PERSON': '[unused2]',
-        'OBJ=PERSON': '[unused3]',
-        'OBJ=ORGANIZATION': '[unused4]',
-        'OBJ=DATE': '[unused5]',
-        'OBJ=NUMBER': '[unused6]',
-        'OBJ=TITLE': '[unused7]',
-        'OBJ=COUNTRY': '[unused8]',
-        'OBJ=LOCATION': '[unused9]',
-        'OBJ=CITY': '[unused10]',
-        'OBJ=MISC': '[unused11]',
-        'OBJ=STATE_OR_PROVINCE': '[unused12]',
-        'OBJ=DURATION': '[unused13]',
-        'OBJ=NATIONALITY': '[unused14]',
-        'OBJ=CAUSE_OF_DEATH': '[unused15]',
-        'OBJ=CRIMINAL_CHARGE': '[unused16]',
-        'OBJ=RELIGION': '[unused17]',
-        'OBJ=URL': '[unused18]',
-        'OBJ=IDEOLOGY': '[unused19]'
+        'SUBJ=0': '[unused1]',
+        'SUBJ=TITLE': '[unused2]',
+        'SUBJ=CAUSE_OF_DEATH': '[unused3]',
+        'SUBJ=CRIMINAL_CHARGE': '[unused4]',
+        'SUBJ=ORGANIZATION': '[unused5]',
+        'SUBJ=DATE': '[unused6]',
+        'SUBJ=DURATION': '[unused7]',
+        'SUBJ=PERSON': '[unused8]',
+        'SUBJ=NUMBER': '[unused9]',
+        'SUBJ=STATE_OR_PROVINCE': '[unused10]',
+        'SUBJ=MONEY': '[unused11]',
+        'SUBJ=IDEOLOGY': '[unused12]',
+        'SUBJ=TIME': '[unused13]',
+        'SUBJ=COUNTRY': '[unused14]',
+        'SUBJ=RELIGION': '[unused15]',
+        'SUBJ=LOCATION': '[unused16]',
+        'SUBJ=ORDINAL': '[unused17]',
+        'SUBJ=NATIONALITY': '[unused18]',
+
+        'OBJ=O': '[unused19]',
+        'OBJ=TITLE': '[unused20]',
+        'OBJ=CAUSE_OF_DEATH': '[unused21]',
+        'OBJ=CRIMINAL_CHARGE': '[unused22]',
+        'OBJ=DATE': '[unused23]',
+        'OBJ=SET': '[unused24]',
+        'OBJ=DURATION': '[unused25]',
+        'OBJ=MONEY': '[unused26]',
+        'OBJ=RELIGION': '[unused27]',
+        'OBJ=COUNTRY': '[unused28]',
+        'OBJ=IDEOLOGY': '[unused29]',
+        'OBJ=NATIONALITY': '[unused30]',
+        'OBJ=LOCATION': '[unused31]',
+        'OBJ=MISC': '[unused32]',
+        'OBJ=TIME': '[unused33]',
+        'ORG=ORDINAL': '[unused34]',
 
     }
-    object_indices = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+    """Loads a data file into a list of `InputBatch`s."""
+
+    object_indices = np.arange(19, 35).tolist()
     kg = {}
     object_offset = 3
     def get_special_token(w):
