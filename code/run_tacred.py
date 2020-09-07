@@ -125,9 +125,12 @@ class DataProcessor(object):
         dataset = self._read_json(os.path.join(data_dir, "train_sampled.json"))
         count = Counter()
         for example in dataset:
-            count[example['relation']] += 1
+            relation = example['relation']
+            if '(e2,e1)' in relation or '(e1,e2)' in relation:
+                relation = relation[:-7]
+            count[relation] += 1
         logger.info("%d labels" % len(count))
-        # Make sure the negative label is alwyas 0
+        # Make sure the negative label is always 0
         labels = [negative_label]
         for label, count in count.most_common():
             logger.info("%s: %.2f%%" % (label, count * 100.0 / len(dataset)))
@@ -215,7 +218,8 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
         if ex_index % 10000 == 0:
             logger.info("Writing example %d of %d" % (ex_index, len(examples)))
 
-        if example.ner2 in {'SUBJ_START', 'SUBJ_END', 'OBJ_START', 'OBJ_END'}:
+        skip_set = {'SUBJ_START', 'SUBJ_END', 'OBJ_START', 'OBJ_END'}
+        if example.ner2 in skip_set or example.ner1 in skip_set:
             skip_count += 1
             continue
 
@@ -227,7 +231,10 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
         SUBJECT_NER = get_special_token("SUBJ=%s" % example.ner1)
         OBJECT_NER = get_special_token("OBJ=%s" % example.ner2)
         subject_id, object_id = tokenizer.convert_tokens_to_ids([SUBJECT_NER, OBJECT_NER])
-        relation_id = label2id[example.label]
+        relation = example.label
+        if '(e2,e1)' in relation or '(e1,e2)' in relation:
+            relation = relation[:-7]
+        relation_id = label2id[relation]
         e1rel = (subject_id, relation_id)
         if e1rel not in kg:
             kg[e1rel] = set()
