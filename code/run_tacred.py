@@ -319,7 +319,7 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
                               label_id=label_id,
                               subject_id=subject_id
                               ))
-    if skip_count > 0
+    if skip_count > 0:
         print('Skip Number: {}'.format(skip_count))
         exit()
     # Add KG outputs to features
