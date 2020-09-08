@@ -25,7 +25,7 @@ fp16: True
 loss_scale: 0
 
 with_jrrelp: True
-jrrelp_lambda: .25
+jrrelp_lambda: .012
 without_observed: False
 without_verification: False
 exclude_no_relation: False
