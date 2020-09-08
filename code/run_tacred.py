@@ -117,10 +117,13 @@ class DataProcessor(object):
         return self._create_examples(
             self._read_json(os.path.join(data_dir, f"dev_{self.version}.json")), "dev")
 
-    def get_test_examples(self, data_dir):
+    def get_test_examples(self, data_dir, indices_load_path):
         """See base class."""
-        return self._create_examples(
-            self._read_json(os.path.join(data_dir, f"test_{self.version}.json")), "test")
+        test_data = self._read_json(os.path.join(data_dir, f"test_{self.version}.json"))
+        if indices_load_path is not None:
+            ids = set(np.loadtxt(indices_load_path, dtype=np.str).tolist())
+            test_data = [ex for ex in test_data if ex['id'] in ids]
+        return self._create_examples(test_data, "test")
 
     def get_labels(self, data_dir, negative_label="no_relation"):
         """See base class."""
@@ -659,14 +662,9 @@ def main(args):
 
     if args.do_eval:
         if args.eval_test:
-            eval_examples = processor.get_test_examples(args.data_dir)
+            eval_examples = processor.get_test_examples(args.data_dir, args['indices_load_path'])
             eval_features = convert_examples_to_features(
                 eval_examples, label2id, args.max_seq_length, tokenizer, special_tokens, args.feature_mode)
-            if args['indices_load_path'] is not None:
-                ids = set(np.loadtxt(args['indices_load_path'], dtype=np.str).tolist())
-                #indices = set(np.loadtxt(args['indices_load_path']).tolist())
-                eval_examples = [ex for i, ex in enumerate(eval_examples) if ex['id'] in indices]
-                eval_features = [ex for i, ex in enumerate(eval_features) if ex['id'] in indices]
             logger.info("***** Test *****")
             logger.info("  Num examples = %d", len(eval_examples))
             logger.info("  Batch size = %d", args.eval_batch_size)
