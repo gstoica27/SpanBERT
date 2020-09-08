@@ -1,6 +1,7 @@
 model: spanbert-large-cased
 data_dir: /usr0/home/gis/data/tacred/data/json/relabeled
 output_dir:
+indices_load_path:
 eval_per_epoch: 10
 max_seq_length: 128
 negative_label: "no_relation"
