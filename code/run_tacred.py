@@ -343,6 +343,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     wrong_indices = indices['wrong_indices']
     correct_indices = indices['correct_indices']
     wrong_relations = indices['wrong_predictions']
+    correct_predictions = indices['correct_predictions']
     wrong_ids = [d['id'] for d in raw_data[wrong_indices]]
     correct_ids = [d['id'] for d in raw_data[correct_indices]]
     print('Num Correct: {} | Num Wrong: {}'.format(len(correct_indices), len(wrong_indices)))
@@ -355,6 +356,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), correct_ids, fmt='%s')
     np.savetxt(os.path.join(save_dir, 'wrong_ids.txt'), wrong_ids, fmt='%s')
     np.savetxt(os.path.join(save_dir, 'wrong_predictions.txt'), wrong_relations, fmt='%s')
+    np.savetxt(os.path.join(save_dir, 'correct_predictions.txt'), correct_predictions, fmt='%s')
     result = compute_f1(preds, eval_label_ids.numpy())
     result['accuracy'] = simple_accuracy(preds, eval_label_ids.numpy())
     result['eval_loss'] = eval_loss
