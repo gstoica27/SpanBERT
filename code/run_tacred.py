@@ -351,7 +351,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     print('Wrong Predictions: {}')
     print(Counter(wrong_relations))
     # save_dir = os.path.join(cfg_dict['test_save_dir'], cfg_dict['id'])
-    save_dir = '/home/ec2-user/apex/SpanBERT/indices_dir/tacred/retacred_wrong'
+    save_dir = '/home/ec2-user/apex/SpanBERT/indices_dir/tacred/'
     os.makedirs(save_dir, exist_ok=True)
     print('saving to: {}'.format(save_dir))
     np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), correct_ids, fmt='%s')
