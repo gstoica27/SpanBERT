@@ -83,7 +83,7 @@ class DataProcessor(object):
         """See base class."""
         raw_data = self._read_json(os.path.join(data_dir, "test.json"))
         ids_path = '/home/ec2-user/apex/SpanBERT/indices_dir/patched/full/wrong_ids.txt'
-        ids = set(np.loadtxt(ids_path, dtype=np.int).tolist())
+        ids = set(np.loadtxt(ids_path, dtype=np.str).tolist())
         raw_data = [d for d in raw_data if d['id'] in ids]
         return self._create_examples(raw_data, "test"), np.array(raw_data)
 
