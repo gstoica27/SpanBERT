@@ -81,8 +81,8 @@ class DataProcessor(object):
 
     def get_test_examples(self, data_dir):
         """See base class."""
-        return self._create_examples(
-            self._read_json(os.path.join(data_dir, "test.json")), "test")
+        raw_data = self._read_json(os.path.join(data_dir, "test.json"))
+        return self._create_examples(raw_data, "test"), np.array(raw_data)
 
     def get_labels(self, data_dir, negative_label="no_relation"):
         """See base class."""
@@ -309,7 +309,7 @@ def compute_f1(preds, labels):
         return {'precision': prec, 'recall': recall, 'f1': f1}
 
 
-def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2label, verbose=True):
+def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2label, verbose=True, raw_data=None):
     model.eval()
     eval_loss = 0
     nb_eval_steps = 0
@@ -340,6 +340,8 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     wrong_indices = indices['wrong_indices']
     correct_indices = indices['correct_indices']
     wrong_relations = indices['wrong_relations']
+    wrong_ids = [d['id'] for d in raw_data[wrong_indices]]
+    correct_ids = [d['id'] for d in raw_data[correct_indices]]
     print('Num Correct: {} | Num Wrong: {}'.format(len(correct_indices), len(wrong_indices)))
     print('Wrong Predictions: {}')
     print(Counter(wrong_relations))
@@ -347,8 +349,8 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     save_dir = '/home/ec2-user/apex/SpanBERT/indices_dir/baseline'
     os.makedirs(save_dir, exist_ok=True)
     print('saving to: {}'.format(save_dir))
-    np.savetxt(os.path.join(save_dir, 'correct_indices.txt'), correct_indices, fmt='%s')
-    np.savetxt(os.path.join(save_dir, 'wrong_indices.txt'), wrong_indices, fmt='%s')
+    np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), correct_ids, fmt='%s')
+    np.savetxt(os.path.join(save_dir, 'wrong_ids.txt'), wrong_ids, fmt='%s')
     np.savetxt(os.path.join(save_dir, 'wrong_predictions.txt'), wrong_relations, fmt='%s')
     result = compute_f1(preds, eval_label_ids.numpy())
     result['accuracy'] = simple_accuracy(preds, eval_label_ids.numpy())
@@ -563,7 +565,7 @@ def main(args):
 
     if args.do_eval:
         if args.eval_test:
-            eval_examples = processor.get_test_examples(args.data_dir)
+            eval_examples, raw_data = processor.get_test_examples(args.data_dir)
             eval_features = convert_examples_to_features(
                 eval_examples, label2id, args.max_seq_length, tokenizer, special_tokens, args.feature_mode)
             logger.info("***** Test *****")
@@ -576,11 +578,13 @@ def main(args):
             eval_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
             eval_dataloader = DataLoader(eval_data, batch_size=args.eval_batch_size)
             eval_label_ids = all_label_ids
+        else:
+            raw_data = None
         model = BertForSequenceClassification.from_pretrained(args.output_dir, num_labels=num_labels)
         if args.fp16:
             model.half()
         model.to(device)
-        preds, result = evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2label)
+        preds, result = evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2label, raw_data=raw_data)
         with open(os.path.join(args.output_dir, "predictions.txt"), "w") as f:
             for ex, pred in zip(eval_examples, preds):
                 f.write("%s\t%s\n" % (ex.guid, id2label[pred]))
