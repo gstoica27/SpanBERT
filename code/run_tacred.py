@@ -123,7 +123,7 @@ class DataProcessor(object):
         if indices_load_path is not None:
             ids = set(np.loadtxt(indices_load_path, dtype=np.str).tolist())
             test_data = [ex for ex in test_data if ex['id'] in ids]
-        return self._create_examples(test_data, "test")
+        return self._create_examples(test_data, "test"), test_data
 
     def get_labels(self, data_dir, negative_label="no_relation"):
         """See base class."""
@@ -357,7 +357,7 @@ def compute_f1(preds, labels):
         return {'precision': prec, 'recall': recall, 'f1': f1}
 
 
-def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2label, verbose=True):
+def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2label, verbose=True, raw_data=None):
     model.eval()
     eval_loss = 0
     nb_eval_steps = 0
@@ -389,11 +389,18 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     correct_indices = indices['correct_indices']
     print('Num Correct: {} | Num Wrong: {}'.format(len(correct_indices), len(wrong_indices)))
     # save_dir = os.path.join(cfg_dict['test_save_dir'], cfg_dict['id'])
-    save_dir = '/home/ec2-user/apex/SpanBERT/indices_dir/patched'
-    os.makedirs(save_dir, exist_ok=True)
-    print('saving to: {}'.format(save_dir))
-    np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), correct_indices, fmt='%s')
-    np.savetxt(os.path.join(save_dir, 'wrong_ids.txt'), wrong_indices, fmt='%s')
+    if raw_data is not None:
+        correct_data = raw_data[correct_indices]
+        wrong_data = raw_data[wrong_indices]
+        correct_ids = [d['id'] for d in correct_data]
+        wrong_ids = [d['id'] for d in wrong_data]
+        save_dir = '/home/ec2-user/apex/SpanBERT/indices_dir/patched/full'
+        os.makedirs(save_dir, exist_ok=True)
+        print('saving to: {}'.format(save_dir))
+        np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), correct_ids, fmt='%s')
+        np.savetxt(os.path.join(save_dir, 'wrong_ids.txt'), wrong_ids, fmt='%s')
+        np.savetxt(os.path.join(save_dir, 'wrong_predictions.txt'), indices['wrong_predictions'], fmt='%s')
+
     result = compute_f1(preds, eval_label_ids.numpy())
     result['accuracy'] = simple_accuracy(preds, eval_label_ids.numpy())
     result['eval_loss'] = eval_loss
@@ -662,7 +669,7 @@ def main(args):
 
     if args.do_eval:
         if args.eval_test:
-            eval_examples = processor.get_test_examples(args.data_dir, args['indices_load_path'])
+            eval_examples, raw_data = processor.get_test_examples(args.data_dir, args['indices_load_path'])
             eval_features = convert_examples_to_features(
                 eval_examples, label2id, args.max_seq_length, tokenizer, special_tokens, args.feature_mode)
             logger.info("***** Test *****")
@@ -675,11 +682,13 @@ def main(args):
             eval_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
             eval_dataloader = DataLoader(eval_data, batch_size=args.eval_batch_size)
             eval_label_ids = all_label_ids
+        else:
+            raw_data = None
         model = BertForSequenceClassification.from_pretrained(args.output_dir, num_labels=num_labels)
         if args.fp16:
             model.half()
         model.to(device)
-        preds, result = evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2label)
+        preds, result = evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2label, raw_data=raw_data)
         with open(os.path.join(args.output_dir, "predictions.txt"), "w") as f:
             for ex, pred in zip(eval_examples, preds):
                 f.write("%s\t%s\n" % (ex.guid, id2label[pred]))
