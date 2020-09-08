@@ -448,7 +448,7 @@ def main(args):
     tokenizer = BertTokenizer.from_pretrained(args.model, do_lower_case=args.do_lower_case)
 
     special_tokens = {}
-    if args.do_eval:
+    if args.do_eval and not args.eval_test:
         eval_examples = processor.get_dev_examples(args.data_dir)
         eval_features = convert_examples_to_features(
             eval_examples, label2id, args.max_seq_length, tokenizer, special_tokens, args.feature_mode)
