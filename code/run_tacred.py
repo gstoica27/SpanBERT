@@ -82,6 +82,9 @@ class DataProcessor(object):
     def get_test_examples(self, data_dir):
         """See base class."""
         raw_data = self._read_json(os.path.join(data_dir, "test.json"))
+        ids_path = '/home/ec2-user/apex/SpanBERT/indices_dir/patched/full/wrong_ids.txt'
+        ids = set(np.loadtxt(ids_path, dtype=np.int).tolist())
+        raw_data = [d for d in raw_data if d['id'] in ids]
         return self._create_examples(raw_data, "test"), np.array(raw_data)
 
     def get_labels(self, data_dir, negative_label="no_relation"):
@@ -346,7 +349,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     print('Wrong Predictions: {}')
     print(Counter(wrong_relations))
     # save_dir = os.path.join(cfg_dict['test_save_dir'], cfg_dict['id'])
-    save_dir = '/home/ec2-user/apex/SpanBERT/indices_dir/baseline'
+    save_dir = '/home/ec2-user/apex/SpanBERT/indices_dir/tacred/retacred_wrong'
     os.makedirs(save_dir, exist_ok=True)
     print('saving to: {}'.format(save_dir))
     np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), correct_ids, fmt='%s')
@@ -402,7 +405,7 @@ def main(args):
     tokenizer = BertTokenizer.from_pretrained(args.model, do_lower_case=args.do_lower_case)
 
     special_tokens = {}
-    if args.do_eval:
+    if args.do_eval and not args.eval_test:
         eval_examples = processor.get_dev_examples(args.data_dir)
         eval_features = convert_examples_to_features(
             eval_examples, label2id, args.max_seq_length, tokenizer, special_tokens, args.feature_mode)
