@@ -222,6 +222,7 @@ def score(key, prediction, verbose=False):
     correct_indices = []
     wrong_predictions = []
     correct_predictions = []
+    all_predictions = []
     # Loop over the data to compute a score
     for row in range(len(key)):
         gold = key[row]
@@ -244,6 +245,7 @@ def score(key, prediction, verbose=False):
         else:
             misclassified_indices.append(row)
             wrong_predictions.append(guess)
+        all_predictions.append(guess)
 
     # Print verbose information
     if verbose:
@@ -352,7 +354,8 @@ def score(key, prediction, verbose=False):
     print("       F1 (micro): {:.3%}".format(f1_micro))
     return {'f1': f1_micro, 'precision': prec_micro, 'recall': recall_micro}, \
            {'wrong_indices': misclassified_indices, 'correct_indices': correct_indices,
-            'wrong_predictions': wrong_predictions, 'correct_predictions': correct_predictions}
+            'wrong_predictions': wrong_predictions, 'correct_predictions': correct_predictions,
+            'all_predictions': all_predictions}
 
 
 if __name__ == "__main__":

@@ -85,27 +85,11 @@ class DataProcessor(object):
         # ids_path = '/home/ec2-user/apex/SpanBERT/indices_dir/patched/full/wrong_ids.txt'
         # ids = set(np.loadtxt(ids_path, dtype=np.str).tolist())
         # raw_data = [d for d in raw_data if d['id'] in ids]
-        for instance in raw_data:
-            relation = instance['relation']
-            if relation == 'per:alternate_names':
-                instance['relation'] = 'per:identity'
-            elif relation == 'org:parents':
-                instance['relation'] = 'org:member_of'
-            elif relation == 'org:subsidiaries':
-                instance['relation'] = 'org:members'
         return self._create_examples(raw_data, "test"), np.array(raw_data)
 
     def get_labels(self, data_dir, negative_label="no_relation"):
         """See base class."""
         dataset = self._read_json(os.path.join(data_dir, "train.json"))
-        for instance in dataset:
-            relation = instance['relation']
-            if relation == 'per:alternate_names':
-                instance['relation'] = 'per:identity'
-            elif relation == 'org:parents':
-                instance['relation'] = 'org:member_of'
-            elif relation == 'org:subsidiaries':
-                instance['relation'] = 'org:members'
         count = Counter()
         for example in dataset:
             count[example['relation']] += 1
@@ -360,19 +344,21 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     correct_indices = indices['correct_indices']
     wrong_relations = indices['wrong_predictions']
     correct_predictions = indices['correct_predictions']
+    all_predictions = indices['all_predictions']
     wrong_ids = [d['id'] for d in raw_data[wrong_indices]]
     correct_ids = [d['id'] for d in raw_data[correct_indices]]
     print('Num Correct: {} | Num Wrong: {}'.format(len(correct_indices), len(wrong_indices)))
     print('Wrong Predictions: {}')
     print(Counter(wrong_relations))
     # save_dir = os.path.join(cfg_dict['test_save_dir'], cfg_dict['id'])
-    save_dir = '/home/ec2-user/apex/SpanBERT/indices_dir/baseline_tacred/retacred_wrong'
+    save_dir = '/home/ec2-user/apex/SpanBERT/indices_dir/tacred/retacred_wrong'
     os.makedirs(save_dir, exist_ok=True)
     print('saving to: {}'.format(save_dir))
     np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), correct_ids, fmt='%s')
     np.savetxt(os.path.join(save_dir, 'wrong_ids.txt'), wrong_ids, fmt='%s')
     np.savetxt(os.path.join(save_dir, 'wrong_predictions.txt'), wrong_relations, fmt='%s')
     np.savetxt(os.path.join(save_dir, 'correct_predictions.txt'), correct_predictions, fmt='%s')
+    np.savetxt(os.path.join(save_dir, 'all_predictions.txt'), all_predictions, fmt='%s')
     result = compute_f1(preds, eval_label_ids.numpy())
     result['accuracy'] = simple_accuracy(preds, eval_label_ids.numpy())
     result['eval_loss'] = eval_loss
