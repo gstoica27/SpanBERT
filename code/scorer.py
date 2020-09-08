@@ -164,6 +164,7 @@ def score(key, prediction, verbose=False):
     gold_by_relation = Counter()
     misclassified_indices = []
     correct_indices = []
+    wrong_relations = []
     # Loop over the data to compute a score
     for row in range(len(key)):
         gold = key[row]
@@ -184,6 +185,7 @@ def score(key, prediction, verbose=False):
             correct_indices.append(row)
         else:
             misclassified_indices.append(row)
+            wrong_relations.append(guess)
 
     # Print verbose information
     if verbose:
@@ -291,7 +293,8 @@ def score(key, prediction, verbose=False):
     print("   Recall (micro): {:.3%}".format(recall_micro))
     print("       F1 (micro): {:.3%}".format(f1_micro))
     return {'f1': f1_micro, 'precision': prec_micro, 'recall': recall_micro}, \
-           {'wrong_indices': misclassified_indices, 'correct_indices': correct_indices}
+           {'wrong_indices': misclassified_indices, 'correct_indices': correct_indices,
+            'wrong_relations': wrong_relations}
 
 
 if __name__ == "__main__":
