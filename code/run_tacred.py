@@ -386,11 +386,11 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     correct_indices = indices['correct_indices']
     print('Num Correct: {} | Num Wrong: {}'.format(len(correct_indices), len(wrong_indices)))
     # save_dir = os.path.join(cfg_dict['test_save_dir'], cfg_dict['id'])
-    save_dir = ''
+    save_dir = '/home/ec2-user/apex/SpanBERT/indices_dir/patched'
     os.makedirs(save_dir, exist_ok=True)
     print('saving to: {}'.format(save_dir))
     np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), correct_indices, fmt='%s')
-    np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), wrong_indices, fmt='%s')
+    np.savetxt(os.path.join(save_dir, 'wrong_ids.txt'), wrong_indices, fmt='%s')
     result = compute_f1(preds, eval_label_ids.numpy())
     result['accuracy'] = simple_accuracy(preds, eval_label_ids.numpy())
     result['eval_loss'] = eval_loss
@@ -663,9 +663,10 @@ def main(args):
             eval_features = convert_examples_to_features(
                 eval_examples, label2id, args.max_seq_length, tokenizer, special_tokens, args.feature_mode)
             if args['indices_load_path'] is not None:
-                indices = set(np.loadtxt(args['indices_load_path']).tolist())
-                eval_examples = [ex for i, ex in enumerate(eval_examples) if ex in indices]
-                eval_features = [ex for i, ex in enumerate(eval_features) if i in indices]
+                ids = set(np.loadtxt(args['indices_load_path'], dtype=np.str).tolist())
+                #indices = set(np.loadtxt(args['indices_load_path']).tolist())
+                eval_examples = [ex for i, ex in enumerate(eval_examples) if ex['id'] in indices]
+                eval_features = [ex for i, ex in enumerate(eval_features) if ex['id'] in indices]
             logger.info("***** Test *****")
             logger.info("  Num examples = %d", len(eval_examples))
             logger.info("  Batch size = %d", args.eval_batch_size)
