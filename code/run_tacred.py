@@ -341,11 +341,11 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     correct_indices = indices['correct_indices']
     print('Num Correct: {} | Num Wrong: {}'.format(len(correct_indices), len(wrong_indices)))
     # save_dir = os.path.join(cfg_dict['test_save_dir'], cfg_dict['id'])
-    save_dir = ''
+    save_dir = '/home/ec2-user/apex/SpanBERT/indices_dir/baseline'
     os.makedirs(save_dir, exist_ok=True)
     print('saving to: {}'.format(save_dir))
     np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), correct_indices, fmt='%s')
-    np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), wrong_indices, fmt='%s')
+    np.savetxt(os.path.join(save_dir, 'wrong_ids.txt'), wrong_indices, fmt='%s')
 
     result = compute_f1(preds, eval_label_ids.numpy())
     result['accuracy'] = simple_accuracy(preds, eval_label_ids.numpy())
