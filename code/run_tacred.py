@@ -339,7 +339,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
 
     wrong_indices = indices['wrong_indices']
     correct_indices = indices['correct_indices']
-    wrong_relations = indices['wrong_relations']
+    wrong_relations = indices['wrong_predictions']
     wrong_ids = [d['id'] for d in raw_data[wrong_indices]]
     correct_ids = [d['id'] for d in raw_data[correct_indices]]
     print('Num Correct: {} | Num Wrong: {}'.format(len(correct_indices), len(wrong_indices)))
