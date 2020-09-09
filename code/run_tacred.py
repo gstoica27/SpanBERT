@@ -408,8 +408,8 @@ def main(args):
     # exit()
     id2label = {i: label for i, label in enumerate(label_list)}
     num_labels = len(label_list)
-    # tokenizer = BertTokenizer.from_pretrained(args.model, do_lower_case=args.do_lower_case)
-    tokenizer = BertTokenizer.from_pretrained('bert-large-cased', do_lower_case=args.do_lower_case)
+    tokenizer = BertTokenizer.from_pretrained(args.model, do_lower_case=args.do_lower_case)
+    # tokenizer = BertTokenizer.from_pretrained('bert-large-cased', do_lower_case=args.do_lower_case)
 
     special_tokens = {}
     if args.do_eval and not args.eval_test:
