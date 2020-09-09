@@ -120,9 +120,9 @@ class DataProcessor(object):
     def get_test_examples(self, data_dir, indices_load_path):
         """See base class."""
         test_data = np.array(self._read_json(os.path.join(data_dir, f"test_{self.version}.json")))
-        if indices_load_path is not None:
-            ids = set(np.loadtxt(indices_load_path, dtype=np.str).tolist())
-            test_data = [ex for ex in test_data if ex['id'] in ids]
+        # if indices_load_path is not None:
+        #     ids = set(np.loadtxt(indices_load_path, dtype=np.str).tolist())
+        #     test_data = [ex for ex in test_data if ex['id'] in ids]
         return self._create_examples(test_data, "test"), test_data
 
     def get_labels(self, data_dir, negative_label="no_relation"):
