@@ -1,6 +1,6 @@
 input_drop: 0.25
 hidden_drop: 0.51
-feat_drop: 0.49
+feat_drop: 0.51
 ent_emb_dim: 1024
 ent_emb_shape1: 32
 rel_emb_dim: 1024
