@@ -361,6 +361,10 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     np.savetxt(os.path.join(save_dir, 'correct_predictions.txt'), correct_predictions, fmt='%s')
     np.savetxt(os.path.join(save_dir, 'all_predictions.txt'), all_predictions, fmt='%s')
     np.savetxt(os.path.join(save_dir, 'all_ids.txt'), all_ids, fmt='%s')
+
+    id2preds = {d['id']: pred for d, pred in zip(raw_data, pred_labels)}
+    json.dump(id2preds, open(os.path.join(save_dir, 'id2preds.json'), 'w'))
+
     result = compute_f1(preds, eval_label_ids.numpy())
     result['accuracy'] = simple_accuracy(preds, eval_label_ids.numpy())
     result['eval_loss'] = eval_loss
