@@ -155,7 +155,6 @@ class BertTokenizer(object):
         Instantiate a PreTrainedBertModel from a pre-trained model file.
         Download and cache the pre-trained model file if needed.
         """
-        print('HERE!!!!!!')
         if pretrained_model_name_or_path in PRETRAINED_VOCAB_ARCHIVE_MAP:
             vocab_file = PRETRAINED_VOCAB_ARCHIVE_MAP[pretrained_model_name_or_path]
             if '-cased' in pretrained_model_name_or_path and kwargs.get('do_lower_case', True):
@@ -195,10 +194,7 @@ class BertTokenizer(object):
             max_len = PRETRAINED_VOCAB_POSITIONAL_EMBEDDINGS_SIZE_MAP[pretrained_model_name_or_path]
             kwargs['max_len'] = min(kwargs.get('max_len', int(1e12)), max_len)
         # Instantiate tokenizer.
-        print('PATH: {}'.format(resolved_vocab_file))
         tokenizer = cls(resolved_vocab_file, *inputs, **kwargs)
-        print('TOKENIZER: {}'.format(tokenizer))
-        exit()
         return tokenizer
 
 
