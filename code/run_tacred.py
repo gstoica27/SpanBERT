@@ -69,6 +69,42 @@ def create_model_name(cfg_dict):
         aggregate_name = os.path.join(top_level_name, approach_type, main_name)
     return aggregate_name
 
+def compute_ranks(probs, gold_labels, label2id, id2label, hits_to_compute=(1, 3, 5, 10, 20, 50)):
+    gold_ids = np.array([label2id[label] for label in gold_labels])
+    all_probs = np.stack(probs, axis=0)
+    sorted_args = np.argsort(-all_probs, axis=-1)
+    ranks = []
+    assert len(sorted_args) == len(gold_labels)
+    for row_args, gold_label in zip(sorted_args, gold_ids):
+        if id2label[gold_label] == 'no_relation':
+            continue
+        rank = int(np.where(row_args == gold_label)[0]) + 1
+        ranks.append(rank)
+    # print(Counter(ranks))
+    ranks = np.array(ranks)
+    hits = {hits_level: [] for hits_level in hits_to_compute}
+    name2ranks = {}
+    for hit_level in hits_to_compute:
+        valid_preds = np.sum(ranks <= hit_level)
+        hits[hit_level] = valid_preds / len(ranks)
+
+    for hit_level in hits:
+        name = 'HITs@{}'.format(int(hit_level))
+        name2ranks[name] = hits[hit_level]
+
+    mr = np.mean(ranks)
+    mrr = np.mean(1. / ranks)
+    name2ranks['MRR'] = mrr
+    name2ranks['MR'] = mr
+    print('RANKS:')
+    for name, metric in name2ranks.items():
+        if 'HIT' in name or 'MRR' in name:
+            value = round(metric * 100, 2)
+        else:
+            value = round(metric, 2)
+        print('{}: {}'.format(name, value))
+    return name2ranks
+
 class InputExample(object):
     """A single training/test example for span pair classification."""
 
@@ -402,8 +438,24 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
         np.savetxt(os.path.join(save_dir, 'wrong_ids.txt'), wrong_ids, fmt='%s')
         np.savetxt(os.path.join(save_dir, 'wrong_predictions.txt'), indices['wrong_predictions'], fmt='%s')
 
+        ids = [instance['id'] for instance in raw_data]
+        formatted_data = []
+        for instance_id, pred, gold in zip(ids, pred_labels, eval_labels):
+            formatted_data.append(
+                {
+                    "id": instance_id.replace("'", '"'),
+                    "label_true": gold.replace("'", '"'),
+                    "label_pred": pred.replace("'", '"')
+                }
+            )
+
         id2preds = {d['id']: pred for d, pred in zip(raw_data, pred_labels)}
         json.dump(id2preds, open(os.path.join(save_dir, 'id2preds.json'), 'w'))
+
+        with open(os.path.join(save_dir, 'spanbert_retacred.jsonl'), 'w') as handle:
+            for instance in formatted_data:
+                line = "{}\n".format(instance)
+                handle.write(line)
 
     result = compute_f1(preds, eval_label_ids.numpy())
     result['accuracy'] = simple_accuracy(preds, eval_label_ids.numpy())
