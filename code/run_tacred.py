@@ -362,8 +362,24 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     np.savetxt(os.path.join(save_dir, 'all_predictions.txt'), all_predictions, fmt='%s')
     np.savetxt(os.path.join(save_dir, 'all_ids.txt'), all_ids, fmt='%s')
 
+    ids = [instance['id'] for instance in raw_data]
+    formatted_data = []
+    for instance_id, pred, gold in zip(ids, pred_labels, eval_labels):
+        formatted_data.append(
+            {
+                "id": instance_id.replace("'", '"'),
+                "label_true": gold.replace("'", '"'),
+                "label_pred": pred.replace("'", '"')
+            }
+        )
+
     id2preds = {d['id']: pred for d, pred in zip(raw_data, pred_labels)}
     json.dump(id2preds, open(os.path.join(save_dir, 'id2preds.json'), 'w'))
+
+    with open(os.path.join(save_dir, 'spanbert_tacred.jsonl'), 'w') as handle:
+        for instance in formatted_data:
+            line = "{}\n".format(instance)
+            handle.write(line)
 
     result = compute_f1(preds, eval_label_ids.numpy())
     result['accuracy'] = simple_accuracy(preds, eval_label_ids.numpy())
