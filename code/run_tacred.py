@@ -377,6 +377,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     json.dump(id2preds, open(os.path.join(save_dir, 'id2preds.json'), 'w'))
 
     with open(os.path.join(save_dir, 'spanbert_tacred.jsonl'), 'w') as handle:
+        print('Saving to: {}'.format(os.path.join(save_dir, 'spanbert_tacred.jsonl')))
         for instance in formatted_data:
             line = "{}\n".format(instance)
             handle.write(line)
