@@ -311,6 +311,44 @@ def compute_f1(preds, labels):
             f1 = 0.0
         return {'precision': prec, 'recall': recall, 'f1': f1}
 
+def compute_structure_parts(data):
+    argdists = []
+    sentlens = []
+    for instance in data:
+        ss, se = instance['subj_start'], instance['subj_end']
+        os, oe = instance['obj_start'], instance['obj_end']
+        sentlens.append(len(instance['token']))
+        if ss > oe:
+            argdist = ss - oe
+        else:
+            argdist = os - se
+        argdists.append(argdist)
+    return {'argdists': argdists, 'sentlens': sentlens}
+
+def compute_structure_errors(parts, preds, gold_labels):
+    structure_errors = {'argdist=1': [], 'argdist>10': [], 'sentlen>30': []}
+    argdists = parts['argdists']
+    sentlens = parts['sentlens']
+    for i in range(len(argdists)):
+        argdist = argdists[i]
+        sentlen = sentlens[i]
+        pred = preds[i]
+        gold = gold_labels[i]
+        is_correct = pred == gold
+
+        if argdist <= 1:
+            structure_errors['argdist=1'].append(is_correct)
+        if argdist > 10:
+            structure_errors['argdist>10'].append(is_correct)
+        if sentlen > 30:
+            structure_errors['sentlen>30'].append(is_correct)
+    print('Structure Errors:')
+    for structure_name, error_list in structure_errors.items():
+        accuracy = round(np.mean(error_list) * 100., 4)
+        print('{} | Accuracy: {} | Correct: {} | Wrong: {} | Total: {} '.format(
+            structure_name, accuracy, sum(error_list), len(error_list) - sum(error_list), len(error_list)
+        ))
+    return structure_errors
 
 def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2label, verbose=True, raw_data=None):
     model.eval()
@@ -339,6 +377,9 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     pred_labels = [id2label[pred_id] for pred_id in preds]
     eval_labels = [id2label[label_id] for label_id in eval_label_ids.numpy().reshape(-1)]
     _, indices = score(eval_labels, pred_labels, verbose=verbose)
+
+    structure_parts = compute_structure_parts(raw_data)
+    compute_structure_errors(structure_parts, preds=pred_labels, gold_labels=eval_labels)
 
     wrong_indices = indices['wrong_indices']
     correct_indices = indices['correct_indices']
