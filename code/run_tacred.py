@@ -153,10 +153,10 @@ class DataProcessor(object):
         return self._create_examples(
             self._read_json(os.path.join(data_dir, f"dev_{self.version}.json")), "dev")
 
-    def get_test_examples(self, data_dir, indices_load_path):
+    def get_test_examples(self, data_dir, indices_load_path, filename="test_clean.json"):
         """See base class."""
-        # test_data = np.array(self._read_json(os.path.join(data_dir, f"test_{self.version}.json")))
-        test_data = np.array(self._read_json('/home/ec2-user/converted_tacred_test.json'))
+        test_data = np.array(self._read_json(os.path.join(data_dir, filename)))
+        # test_data = np.array(self._read_json('/home/ec2-user/converted_tacred_test.json'))
         # if indices_load_path is not None:
         #     ids = set(np.loadtxt(indices_load_path, dtype=np.str).tolist())
         #     test_data = [ex for ex in test_data if ex['id'] in ids]
@@ -470,7 +470,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
         wrong_data = raw_data[wrong_indices]
         correct_ids = [d['id'] for d in correct_data]
         wrong_ids = [d['id'] for d in wrong_data]
-        save_dir = '/home/ec2-user/apex/SpanBERT/indices_dir/patched/full'
+        save_dir = os.path.join(os.getcwd(), 'indices_dir')
         os.makedirs(save_dir, exist_ok=True)
         print('saving to: {}'.format(save_dir))
         np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), correct_ids, fmt='%s')
@@ -767,7 +767,11 @@ def main(args):
 
     if args.do_eval:
         if args.eval_test:
-            eval_examples, raw_data = processor.get_test_examples(args.data_dir, args['indices_load_path'])
+            if args.eval_path is not None:
+                filename = args.eval_path
+            else:
+                filename = f"test_{args.version}.json"
+            eval_examples, raw_data = processor.get_test_examples(args.data_dir, args['indices_load_path'], filename)
             eval_features = convert_examples_to_features(
                 eval_examples, label2id, args.max_seq_length, tokenizer, special_tokens, args.feature_mode)
             logger.info("***** Test *****")
