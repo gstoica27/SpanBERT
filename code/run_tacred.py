@@ -221,8 +221,12 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
         'OBJ=CRIMINAL_CHARGE': '[unused16]',
         'OBJ=RELIGION': '[unused17]',
         'OBJ=URL': '[unused18]',
-        'OBJ=IDEOLOGY': '[unused19]'
-
+        'OBJ=IDEOLOGY': '[unused19]',
+        # Placements for Subj/Obj
+        '<e1>': '[unused20]',
+        '</e1>': '[unused21]',
+        '<e2>': '[unused22]',
+        '</e2>': '[unused23]'
     }
     object_indices = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     kg = {}
@@ -247,6 +251,15 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
         OBJECT_END = get_special_token("OBJ_END")
         SUBJECT_NER = get_special_token("SUBJ=%s" % example.ner1)
         OBJECT_NER = get_special_token("OBJ=%s" % example.ner2)
+        # Start/End tokens
+        e1_start = get_special_token('<e1>')
+        e1_end = get_special_token('</e1>')
+        e2_start = get_special_token('<e2>')
+        e2_end = get_special_token('</e2>')
+        # Convert to ids
+        e1_start_id, e1_end_id, e2_start_id, e2_end_id = tokenizer.convert_tokens_to_ids(
+            [e1_start, e1_end, e2_start, e2_end]
+        )
         subject_id, object_id = tokenizer.convert_tokens_to_ids([SUBJECT_NER, OBJECT_NER])
         relation_id = label2id[example.label]
         e1rel = (subject_id, relation_id)
@@ -276,9 +289,11 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
             obj_tokens = []
             for i, token in enumerate(example.sentence):
                 if i == example.span1[0]:
-                    tokens.append(SUBJECT_NER)
+                    tokens.append(e1_start_id)
+                    # tokens.append(SUBJECT_NER)
                 if i == example.span2[0]:
-                    tokens.append(OBJECT_NER)
+                    tokens.append(e2_start_id)
+                    # tokens.append(OBJECT_NER)
                 if (i >= example.span1[0]) and (i <= example.span1[1]):
                     for sub_token in tokenizer.tokenize(token):
                         subj_tokens.append(sub_token)
