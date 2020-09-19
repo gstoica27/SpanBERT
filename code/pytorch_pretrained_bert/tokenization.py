@@ -193,8 +193,7 @@ class BertTokenizer(object):
             # than the number of positional embeddings
             max_len = PRETRAINED_VOCAB_POSITIONAL_EMBEDDINGS_SIZE_MAP[pretrained_model_name_or_path]
             kwargs['max_len'] = min(kwargs.get('max_len', int(1e12)), max_len)
-        # Instantiate tokenizer.
-        print(resolved_vocab_file)
+
         tokenizer = cls(resolved_vocab_file, *inputs, **kwargs)
         return tokenizer
 

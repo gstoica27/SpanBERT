@@ -289,10 +289,10 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
             obj_tokens = []
             for i, token in enumerate(example.sentence):
                 if i == example.span1[0]:
-                    tokens.append(e1_start_id)
+                    tokens.append(e1_start)
                     # tokens.append(SUBJECT_NER)
                 if i == example.span2[0]:
-                    tokens.append(e2_start_id)
+                    tokens.append(e2_start)
                     # tokens.append(OBJECT_NER)
                 if (i >= example.span1[0]) and (i <= example.span1[1]):
                     for sub_token in tokenizer.tokenize(token):
