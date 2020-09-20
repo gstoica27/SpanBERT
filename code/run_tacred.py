@@ -297,12 +297,19 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
                 if (i >= example.span1[0]) and (i <= example.span1[1]):
                     for sub_token in tokenizer.tokenize(token):
                         subj_tokens.append(sub_token)
+                        tokens.append(sub_token)
                 elif (i >= example.span2[0]) and (i <= example.span2[1]):
                     for sub_token in tokenizer.tokenize(token):
                         obj_tokens.append(sub_token)
+                        tokens.append(sub_token)
                 else:
                     for sub_token in tokenizer.tokenize(token):
                         tokens.append(sub_token)
+                if i == example.span1[1]:
+                    tokens.append(e1_end)
+                if i == example.span2[1]:
+                    tokens.append(e2_end)
+
             if mode == "ner_text":
                 tokens.append(SEP)
                 for sub_token in subj_tokens:
