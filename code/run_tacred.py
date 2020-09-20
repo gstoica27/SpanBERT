@@ -488,7 +488,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     print('Num Correct: {} | Num Wrong: {}'.format(len(correct_indices), len(wrong_indices)))
     # save_dir = os.path.join(cfg_dict['test_save_dir'], cfg_dict['id'])
     if raw_data is not None:
-        save_dir = os.path.join(os.getcwd(), 'indices_dir')
+        save_dir = os.path.join(os.getcwd(), 'indices_dir', 'wrong_types')
         os.makedirs(save_dir, exist_ok=True)
         print('saving to: {}'.format(save_dir))
 
