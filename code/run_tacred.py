@@ -488,16 +488,12 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     print('Num Correct: {} | Num Wrong: {}'.format(len(correct_indices), len(wrong_indices)))
     # save_dir = os.path.join(cfg_dict['test_save_dir'], cfg_dict['id'])
     if raw_data is not None:
-        correct_data = raw_data[correct_indices]
-        wrong_data = raw_data[wrong_indices]
-        correct_ids = [d['id'] for d in correct_data]
-        wrong_ids = [d['id'] for d in wrong_data]
         save_dir = os.path.join(os.getcwd(), 'indices_dir')
         os.makedirs(save_dir, exist_ok=True)
         print('saving to: {}'.format(save_dir))
-        np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), correct_ids, fmt='%s')
-        np.savetxt(os.path.join(save_dir, 'wrong_ids.txt'), wrong_ids, fmt='%s')
-        np.savetxt(os.path.join(save_dir, 'wrong_predictions.txt'), indices['wrong_predictions'], fmt='%s')
+
+        np.savetxt(os.path.join(save_dir, 'prediction_logits.txt'), logits)
+        json.dump(id2label, open(os.path.join(save_dir, 'id2label.json'), 'r'))
 
         ids = [instance['id'] for instance in raw_data]
         formatted_data = []
