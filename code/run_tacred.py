@@ -460,6 +460,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     eval_loss = 0
     nb_eval_steps = 0
     preds = []
+    data_logits = []
     for input_ids, input_mask, segment_ids, label_ids in eval_dataloader:
         input_ids = input_ids.to(device)
         input_mask = input_mask.to(device)
@@ -477,6 +478,9 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
             preds[0] = np.append(
                 preds[0], logits.detach().cpu().numpy(), axis=0)
 
+        data_logits.append(logits.detach().cpu().numpy())
+
+    data_logits = np.stack(data_logits, axis=0)
     eval_loss = eval_loss / nb_eval_steps
     preds = np.argmax(preds[0], axis=1).reshape(-1)
     pred_labels = [id2label[pred_id] for pred_id in preds]
@@ -492,7 +496,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
         os.makedirs(save_dir, exist_ok=True)
         print('saving to: {}'.format(save_dir))
 
-        np.savetxt(os.path.join(save_dir, 'prediction_logits.txt'), logits.detach().cpu().numpy())
+        np.savetxt(os.path.join(save_dir, 'prediction_logits.txt'), data_logits)
         json.dump(id2label, open(os.path.join(save_dir, 'id2label.json'), 'w'))
 
         ids = [instance['id'] for instance in raw_data]
