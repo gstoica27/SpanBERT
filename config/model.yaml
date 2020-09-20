@@ -1,6 +1,6 @@
 model: spanbert-large-cased
 data_dir: /usr0/home/gis/data/tacred/data/json/relabeled2_0
-eval_path: #/usr0/home/gis/data/tacred/data/json/relabeled2_0/patched/unmatched_data.json
+eval_path: /usr0/home/gis/data/tacred/data/json/relabeled2_0/patched/unmatched_data.json
 output_dir:
 indices_load_path: #/home/ec2-user/apex/SpanBERT/indices_dir/baseline/wrong_ids.txt
 eval_per_epoch: 10
