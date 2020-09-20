@@ -492,7 +492,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
         os.makedirs(save_dir, exist_ok=True)
         print('saving to: {}'.format(save_dir))
 
-        np.savetxt(os.path.join(save_dir, 'prediction_logits.txt'), logits)
+        np.savetxt(os.path.join(save_dir, 'prediction_logits.txt'), logits.detach().cpu().numpy())
         json.dump(id2label, open(os.path.join(save_dir, 'id2label.json'), 'r'))
 
         ids = [instance['id'] for instance in raw_data]
