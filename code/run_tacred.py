@@ -478,9 +478,9 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
             preds[0] = np.append(
                 preds[0], logits.detach().cpu().numpy(), axis=0)
 
-        data_logits.append(logits.detach().cpu().numpy())
+        data_logits.append(logits.reshape(-1, num_labels).detach().cpu().numpy())
 
-    data_logits = np.stack(data_logits, axis=0)
+    data_logits = np.concatenate(data_logits, axis=0)
     eval_loss = eval_loss / nb_eval_steps
     preds = np.argmax(preds[0], axis=1).reshape(-1)
     pred_labels = [id2label[pred_id] for pred_id in preds]
