@@ -297,12 +297,19 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
                 if (i >= example.span1[0]) and (i <= example.span1[1]):
                     for sub_token in tokenizer.tokenize(token):
                         subj_tokens.append(sub_token)
+                        tokens.append(sub_token)
                 elif (i >= example.span2[0]) and (i <= example.span2[1]):
                     for sub_token in tokenizer.tokenize(token):
                         obj_tokens.append(sub_token)
+                        tokens.append(sub_token)
                 else:
                     for sub_token in tokenizer.tokenize(token):
                         tokens.append(sub_token)
+                if i == example.span1[1]:
+                    tokens.append(e1_end)
+                if i == example.span2[1]:
+                    tokens.append(e2_end)
+
             if mode == "ner_text":
                 tokens.append(SEP)
                 for sub_token in subj_tokens:
@@ -453,6 +460,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     eval_loss = 0
     nb_eval_steps = 0
     preds = []
+    data_logits = []
     for input_ids, input_mask, segment_ids, label_ids in eval_dataloader:
         input_ids = input_ids.to(device)
         input_mask = input_mask.to(device)
@@ -470,6 +478,9 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
             preds[0] = np.append(
                 preds[0], logits.detach().cpu().numpy(), axis=0)
 
+        data_logits.append(logits.reshape(-1, num_labels).detach().cpu().numpy())
+
+    data_logits = np.concatenate(data_logits, axis=0)
     eval_loss = eval_loss / nb_eval_steps
     preds = np.argmax(preds[0], axis=1).reshape(-1)
     pred_labels = [id2label[pred_id] for pred_id in preds]
@@ -481,16 +492,12 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     print('Num Correct: {} | Num Wrong: {}'.format(len(correct_indices), len(wrong_indices)))
     # save_dir = os.path.join(cfg_dict['test_save_dir'], cfg_dict['id'])
     if raw_data is not None:
-        correct_data = raw_data[correct_indices]
-        wrong_data = raw_data[wrong_indices]
-        correct_ids = [d['id'] for d in correct_data]
-        wrong_ids = [d['id'] for d in wrong_data]
-        save_dir = os.path.join(os.getcwd(), 'indices_dir')
+        save_dir = os.path.join(os.getcwd(), 'indices_dir', 'wrong_types')
         os.makedirs(save_dir, exist_ok=True)
         print('saving to: {}'.format(save_dir))
-        np.savetxt(os.path.join(save_dir, 'correct_ids.txt'), correct_ids, fmt='%s')
-        np.savetxt(os.path.join(save_dir, 'wrong_ids.txt'), wrong_ids, fmt='%s')
-        np.savetxt(os.path.join(save_dir, 'wrong_predictions.txt'), indices['wrong_predictions'], fmt='%s')
+
+        np.savetxt(os.path.join(save_dir, 'prediction_logits.txt'), data_logits)
+        json.dump(id2label, open(os.path.join(save_dir, 'id2label.json'), 'w'))
 
         ids = [instance['id'] for instance in raw_data]
         formatted_data = []
