@@ -1,13 +1,13 @@
 model: spanbert-large-cased
-data_dir: /usr0/home/gis/data/tacred/data/json/relabeled2_0
-eval_path: /usr0/home/gis/data/tacred/data/json/relabeled2_0/patched/unmatched_data.json
+data_dir: /usr0/home/gis/data/tacred/data/json/relabeled
+eval_path: /usr0/home/gis/data/tacred/data/json/test.json
 output_dir:
 indices_load_path: #/home/ec2-user/apex/SpanBERT/indices_dir/baseline/wrong_ids.txt
 eval_per_epoch: 10
 max_seq_length: 128
 negative_label: "no_relation"
 # What to run
-do_train: True
+do_train: False
 train_mode: random_sorted # choices: ['random', 'sorted', 'random_sorted']
 do_eval: True
 eval_test: True
@@ -25,8 +25,8 @@ seed: 42
 gradient_accumulation_steps: 2
 fp16: True
 loss_scale: 2
-data_type: patched
-version: clean
+data_type: unpatched
+version: full
 with_jrrelp: False
 #jrrelp_lambda: .1
 #without_observed: False
