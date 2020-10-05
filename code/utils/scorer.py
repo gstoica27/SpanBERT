@@ -239,7 +239,7 @@ category_maps = {
     'mutual_exclusive': {
         'per:countries_of_residence',
         'per:cities_of_residence',
-        'per:stateorprovinces_of_residence'
+        'per:stateorprovinces_of_residence',
         'per:city_of_death',
         'per:city_of_birth',
         'per:stateorprovince_of_death',
