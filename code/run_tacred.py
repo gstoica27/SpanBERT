@@ -230,11 +230,12 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
 
     }
 
-    equivalent_relations = {
-        'per:alternate_names': 'per:identity',
-        'org:subsidiaries': 'org:members',
-        'org:parents': 'org:member_of',
-    }
+    # equivalent_relations = {
+    #     'per:alternate_names': 'per:identity',
+    #     'org:subsidiaries': 'org:members',
+    #     'org:parents': 'org:member_of',
+    # }
+    equivalent_relations = {}
 
     object_indices = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     kg = {}
