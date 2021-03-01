@@ -146,14 +146,14 @@ class DataProcessor(object):
     def get_train_examples(self, data_dir):
         """See base class."""
         return self._create_examples(
-            self._read_json(os.path.join(data_dir, f"train_{self.version}.json")), "train")
+            self._read_json(os.path.join(data_dir, f"train.json")), "train")
 
     def get_dev_examples(self, data_dir):
         """See base class."""
         return self._create_examples(
-            self._read_json(os.path.join(data_dir, f"dev_{self.version}.json")), "dev")
+            self._read_json(os.path.join(data_dir, f"dev.json")), "dev")
 
-    def get_test_examples(self, data_dir, indices_load_path, filename="test_clean.json"):
+    def get_test_examples(self, data_dir, indices_load_path, filename="test.json"):
         """See base class."""
         test_data = np.array(self._read_json(os.path.join(data_dir, filename)))
         # test_data = np.array(self._read_json('/home/ec2-user/converted_tacred_test.json'))
@@ -164,9 +164,14 @@ class DataProcessor(object):
 
     def get_labels(self, data_dir, negative_label="no_relation"):
         """See base class."""
-        train_dataset = self._read_json(os.path.join(data_dir, f"train_{self.version}.json"))
-        dev_dataset = self._read_json(os.path.join(data_dir, f"dev_{self.version}.json"))
-        test_dataset = self._read_json(os.path.join(data_dir, f"test_{self.version}.json"))
+        # train_dataset = self._read_json(os.path.join(data_dir, f"train_{self.version}.json"))
+        # dev_dataset = self._read_json(os.path.join(data_dir, f"dev_{self.version}.json"))
+        # test_dataset = self._read_json(os.path.join(data_dir, f"test_{self.version}.json"))
+
+        train_dataset = self._read_json(os.path.join(data_dir, f"train.json"))
+        dev_dataset = self._read_json(os.path.join(data_dir, f"dev.json"))
+        test_dataset = self._read_json(os.path.join(data_dir, f"test.json"))
+        
         dataset = train_dataset + dev_dataset + test_dataset
         count = Counter()
         for example in dataset:
