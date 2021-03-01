@@ -224,6 +224,13 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
         'OBJ=IDEOLOGY': '[unused19]'
 
     }
+
+    equivalent_relations = {
+        'per:alternate_names': 'per:identity',
+        'org:subsidiaries': 'org:members',
+        'org:parents': 'org:member_of',
+    }
+
     object_indices = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     kg = {}
     object_offset = 3
@@ -248,7 +255,8 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
         SUBJECT_NER = get_special_token("SUBJ=%s" % example.ner1)
         OBJECT_NER = get_special_token("OBJ=%s" % example.ner2)
         subject_id, object_id = tokenizer.convert_tokens_to_ids([SUBJECT_NER, OBJECT_NER])
-        relation_id = label2id[example.label]
+        equivalent_relation = equivalent_relations.get(example.label, example.label)
+        relation_id = label2id[equivalent_relation]
         e1rel = (subject_id, relation_id)
         if e1rel not in kg:
             kg[e1rel] = set()
