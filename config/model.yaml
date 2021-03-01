@@ -1,6 +1,6 @@
 model: spanbert-large-cased
-data_dir: /usr0/home/gis/data/tacred/data/json/relabeled
-eval_path: /usr0/home/gis/data/tacred/data/json/test.json
+data_dir: /home/ec2-user/data/json/relabeled2_0
+eval_path: /home/ec2-user/data/json/test.json
 output_dir:
 indices_load_path: #/home/ec2-user/apex/SpanBERT/indices_dir/baseline/wrong_ids.txt
 eval_per_epoch: 10
@@ -21,12 +21,12 @@ learning_rate: 0.00002 # Play with the LR. Reduce the LR
 num_train_epochs: 10
 warmup_proportion: .1
 no_cuda: False
-seed: 42
+seed: 0
 gradient_accumulation_steps: 2
 fp16: True
 loss_scale: 2
-data_type: unpatched
-version: full
+data_type: patched
+version: clean
 with_jrrelp: False
 #jrrelp_lambda: .1
 #without_observed: False
