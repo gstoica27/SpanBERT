@@ -318,7 +318,8 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
         input_ids += padding
         input_mask += padding
         segment_ids += padding
-        label_id = label2id[example.label]
+        equivalent_relation = equivalent_relations.get(example.label, example.label)
+        label_id = label2id[equivalent_relation]
         assert len(input_ids) == max_seq_length
         assert len(input_mask) == max_seq_length
         assert len(segment_ids) == max_seq_length
