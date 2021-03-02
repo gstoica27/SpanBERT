@@ -885,6 +885,6 @@ if __name__ == "__main__":
             kglp_config = yaml.load(handle)
             args['kglp'] = kglp_config
     args['output_dir'] = os.path.join('tacred_dir', create_model_name(args))
-    # args['data_dir'] = os.path.join(args['data_dir'], args['data_type'])
-    args['data_dir'] = os.path.join(args['data_dir'])
+    args['data_dir'] = os.path.join(args['data_dir'], args['data_type'])
+    # args['data_dir'] = os.path.join(args['data_dir'])
     main(args)
