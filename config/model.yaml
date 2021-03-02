@@ -1,6 +1,6 @@
 model: spanbert-large-cased
-data_dir: /home/ec2-user/data/json/relabeled2_0
-#data_dir: /home/ec2-user/data/json
+#data_dir: /home/ec2-user/data/json/relabeled2_0
+data_dir: /home/ec2-user/data/json
 eval_path: /home/ec2-user/data/json/relabeled2_0/patched/test_clean.json
 output_dir:
 indices_load_path: #/home/ec2-user/apex/SpanBERT/indices_dir/baseline/wrong_ids.txt
