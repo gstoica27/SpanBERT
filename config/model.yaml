@@ -1,6 +1,6 @@
 model: spanbert-large-cased
-#data_dir: /home/ec2-user/data/json/relabeled2_0
-data_dir: /home/ec2-user/data/json
+data_dir: /home/ec2-user/data/json/relabeled2_0
+#data_dir: /home/ec2-user/data/json
 eval_path: /home/ec2-user/data/json/relabeled2_0/patched/test_clean.json
 output_dir:
 indices_load_path: #/home/ec2-user/apex/SpanBERT/indices_dir/baseline/wrong_ids.txt
@@ -26,8 +26,8 @@ seed: 0
 gradient_accumulation_steps: 2
 fp16: True
 loss_scale: 2
-data_type: unpatched
-version: original
+data_type: patched
+version: clean
 with_jrrelp: False
 #jrrelp_lambda: .1
 #without_observed: False
