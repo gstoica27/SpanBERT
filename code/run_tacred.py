@@ -453,6 +453,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     eval_loss = 0
     nb_eval_steps = 0
     preds = []
+    
     for input_ids, input_mask, segment_ids, label_ids in eval_dataloader:
         input_ids = input_ids.to(device)
         input_mask = input_mask.to(device)
@@ -480,6 +481,7 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
     correct_indices = indices['correct_indices']
     print('Num Correct: {} | Num Wrong: {}'.format(len(correct_indices), len(wrong_indices)))
     # save_dir = os.path.join(cfg_dict['test_save_dir'], cfg_dict['id'])
+    import pdb; pdb.set_trace()
     if raw_data is not None:
         correct_data = raw_data[correct_indices]
         wrong_data = raw_data[wrong_indices]
@@ -504,7 +506,9 @@ def evaluate(model, device, eval_dataloader, eval_label_ids, num_labels, id2labe
             )
 
         id2preds = {d['id']: pred for d, pred in zip(raw_data, pred_labels)}
-        json.dump(id2preds, open(os.path.join(save_dir, 'id2preds.json'), 'w'))
+        save_file = os.path.join(save_dir, 'id2preds.json')
+        print('Saving id2preds at {}...'.format(save_file))
+        json.dump(id2preds, open(save_file, 'w'))
 
         structure_parts = compute_structure_parts(raw_data)
         compute_structure_errors(structure_parts, preds=pred_labels, gold_labels=eval_labels)
