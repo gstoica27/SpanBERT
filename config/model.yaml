@@ -27,8 +27,8 @@ seed: 0
 gradient_accumulation_steps: 2
 fp16: True
 loss_scale: 2
-data_type: unpatched
-version: original
+data_type: patched
+version: clean
 with_jrrelp: False
 #jrrelp_lambda: .1
 #without_observed: False
