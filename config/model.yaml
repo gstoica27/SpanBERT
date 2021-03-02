@@ -8,7 +8,7 @@ eval_per_epoch: 10
 max_seq_length: 128
 negative_label: "no_relation"
 # What to run
-do_train: True
+do_train: False
 train_mode: random_sorted # choices: ['random', 'sorted', 'random_sorted']
 do_eval: True
 eval_test: True
