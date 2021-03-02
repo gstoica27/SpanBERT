@@ -146,14 +146,14 @@ class DataProcessor(object):
     def get_train_examples(self, data_dir):
         """See base class."""
         return self._create_examples(
-            # self._read_json(os.path.join(data_dir, f"train_clean.json")), "train")
-            self._read_json(os.path.join(data_dir, f"train.json")), "train")
+            self._read_json(os.path.join(data_dir, f"train_clean.json")), "train")
+            # self._read_json(os.path.join(data_dir, f"train.json")), "train")
 
     def get_dev_examples(self, data_dir):
         """See base class."""
         return self._create_examples(
-            # self._read_json(os.path.join(data_dir, f"dev_clean.json")), "dev")
-            self._read_json(os.path.join(data_dir, f"dev.json")), "dev")
+            self._read_json(os.path.join(data_dir, f"dev_clean.json")), "dev")
+            # self._read_json(os.path.join(data_dir, f"dev.json")), "dev")
 
     def get_test_examples(self, data_dir, indices_load_path, filename="test.json"):
         """See base class."""
@@ -166,13 +166,13 @@ class DataProcessor(object):
 
     def get_labels(self, data_dir, negative_label="no_relation"):
         """See base class."""
-        # train_dataset = self._read_json(os.path.join(data_dir, f"train_{self.version}.json"))
-        # dev_dataset = self._read_json(os.path.join(data_dir, f"dev_{self.version}.json"))
-        # test_dataset = self._read_json(os.path.join(data_dir, f"test_{self.version}.json"))
+        train_dataset = self._read_json(os.path.join(data_dir, f"train_{self.version}.json"))
+        dev_dataset = self._read_json(os.path.join(data_dir, f"dev_{self.version}.json"))
+        test_dataset = self._read_json(os.path.join(data_dir, f"test_{self.version}.json"))
 
-        train_dataset = self._read_json(os.path.join(data_dir, f"train.json"))
-        dev_dataset = self._read_json(os.path.join(data_dir, f"dev.json"))
-        test_dataset = self._read_json(os.path.join(data_dir, f"test.json"))
+        # train_dataset = self._read_json(os.path.join(data_dir, f"train.json"))
+        # dev_dataset = self._read_json(os.path.join(data_dir, f"dev.json"))
+        # test_dataset = self._read_json(os.path.join(data_dir, f"test.json"))
         
         dataset = train_dataset + dev_dataset + test_dataset
         count = Counter()
@@ -232,12 +232,12 @@ def convert_examples_to_features(examples, label2id, max_seq_length, tokenizer, 
 
     }
 
-    # equivalent_relations = {
-    #     'per:alternate_names': 'per:identity',
-    #     'org:subsidiaries': 'org:members',
-    #     'org:parents': 'org:member_of',
-    # }
-    equivalent_relations = {'per:identity': 'per:alternate_names'}
+    equivalent_relations = {
+        'per:alternate_names': 'per:identity',
+        'org:subsidiaries': 'org:members',
+        'org:parents': 'org:member_of',
+    }
+    # equivalent_relations = {'per:identity': 'per:alternate_names'}
     # equivalent_relations = {}
     object_indices = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     kg = {}
@@ -887,6 +887,6 @@ if __name__ == "__main__":
             kglp_config = yaml.load(handle)
             args['kglp'] = kglp_config
     args['output_dir'] = os.path.join('tacred_dir', create_model_name(args))
-    # args['data_dir'] = os.path.join(args['data_dir'], args['data_type'])
-    args['data_dir'] = os.path.join(args['data_dir'])
+    args['data_dir'] = os.path.join(args['data_dir'], args['data_type'])
+    # args['data_dir'] = os.path.join(args['data_dir'])
     main(args)
